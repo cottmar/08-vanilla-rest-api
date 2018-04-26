@@ -6,10 +6,9 @@ const http = require('http');
 const Router = require('./router');
 
 const router = new Router();
-require('../route/note-route')(router);
+require('../route/doge-route')(router);
 
 // Application set up 
-// anonymous
 const app = http.createServer(router.route());
 
 const server = module.exports = {};

@@ -16,7 +16,7 @@ const memory = {};
 // }
 
 
-// schema is the type of resource, in this case NOTE, and it will just be a 'string' saying this is a note schema
+// schema is the type of resource, in this case DOGE, and it will just be a 'string' saying this is a note schema
 // item is an actual object we'll pass in to post a newly created note
 storage.create = function create(schema, item) {
   return new Promise((resolve, reject) => {

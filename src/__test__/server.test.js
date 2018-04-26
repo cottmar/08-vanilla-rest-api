@@ -4,26 +4,79 @@ const server = require('../lib/server');
 const superagent = require('superagent');
 
 const testPort = 5000;
-const mockResource = { title: 'test title', content: 'test content'};
-let mockId = null; 
+const mockResource = { name: 'test name', breed: 'test breed' };
+let mockId = null;
 
 beforeAll(() => server.start(testPort));
 afterAll(() => server.stop());
 
-//In this lab, you MUST post first BEFORE you get
-
 describe('VALID request to the API', () => {
-  describe('POST /api/v1/note', () => {
-    it('should respond with status 201 and created a new note', () => {
-      return superagent.post(`:${testPort}/api/v1/note`)
+  describe('POST /api/v1/doge', () => {
+    it('should respond with status 200 and created a new doge', () => {
+      return superagent.post(`:${testPort}/api/v1/doge`)
         .send(mockResource)
-        .then((res) => {
-          console.log(res.body);
-          mockId = res.body.id; //HINT: Why do we need to reassign this?
-          expect(res.body.title).toEqual(mockResource.title);
-          expect(res.body.content).toEqual(mockResource.content);
-          expect(res.status).toEqual(201);
-        })
+        .then((response) => {
+          mockId = response.body.id;
+          expect(response.body.name).toEqual(mockResource.name);
+          expect(response.body.breed).toEqual(mockResource.breed);
+          expect(response.status).toEqual(200);
+        });
+    });
+  });
+
+  describe('BAD REQUEST no request body was provided', () => {
+    describe('POST /api/v1/doge', () => {
+      it('should respond with status 400 if no request body was provided or the body was invalid', () => {
+        return superagent.post(`:${testPort}/api/v1/doge`)
+          .send(mockResource)
+          .then((response) => {
+            mockId = response.body.id;
+            expect(response.body.name).toEqual(mockResource.name);
+            expect(response.body.breed).toEqual(mockResource.breed);
+            expect(response.status).toEqual(400);
+          });
+      });
+    });
+  });
+
+  describe('NOT FOUND', () => {
+    describe('GET /api/v1/doge', () => {
+      it('it should respond with NOT FOUND for valid requests made with an id that was not found', () => {
+        return superagent.get(':5000/api/v1/doge1')
+          .then(() => {})
+          .catch((err) => {
+            expect(err.status).toEqual(404);
+            expect(err).toBeTruthy();
+          });
+      });
+    });
+  });
+
+  describe('BAD REQUEST', () => {
+    describe('GET /api/v1/cowsay', () => {
+      it('should err out with 400 status code because no id was provided in the request', () => {
+        return superagent.get(':5000/api/v1/cowsay')
+          .then(() => {})
+          .catch((err) => {
+            expect(err.status).toEqual(400);
+            expect(err).toBeTruthy();
+          });
+      });
+    });
+
+    describe('VALID request to the API', () => {
+      describe('GET /api/v1/doge', () => {
+        it('it should contain a response body for a request made with a valid id', () => {
+          return superagent.post(`:${testPort}/api/v1/doge${mockId}`)
+            .send(mockResource)
+            .then((response) => {
+              mockId = response.body.id;
+              expect(response.body.name).toEqual(mockResource.name);
+              expect(response.body.breed).toEqual(mockResource.breed);
+              expect(response.status).toEqual(200);
+            });
+        });
+      });
     });
   });
 });

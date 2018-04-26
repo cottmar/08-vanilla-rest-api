@@ -1,24 +1,24 @@
 'use strict';
 
 const logger = require('../lib/logger');
-const Note = require('../model/note');
+const Doge = require('../model/doge');
 const storage = require('../lib/storage');
 
 module.exports = function routeNote(router) {
-  router.post('/api/v1/note', (req, res) => {
-    logger.log(logger.INFO, 'NOTE-ROUTE: POST /api/v1/note');
+  router.post('/api/v1/doge', (req, res) => {
+    logger.log(logger.INFO, 'NOTE-ROUTE: POST /api/v1/doge');
 
     try {
-      const newNote = new Note(req.body.title, req.body.content);
-      storage.create('Note', newNote)
-        .then((note) => {
-          res.writeHead(201, { 'Content-Type': 'application/json' });
-          res.write(JSON.stringify(note));
+      const newDoge = new Doge(req.body.name, req.body.breed);
+      storage.create('Doge', newDoge)
+        .then((doge) => {
+          res.writeHead(200, { 'Content-Type': 'application/json' });
+          res.write(JSON.stringify(doge));
           res.end();
           return undefined;
         });
     } catch (err) {
-      logger.log(logger.ERROR, `ROUTE-NOTE: There was a bad request ${err}`);
+      logger.log(logger.ERROR, `DOGE-ROUTE: There was a bad request ${err}`);
       res.writeHead(400, { 'Content-Type': 'text/plain' });
       res.write('Bad request THIS OTHER ONE');
       res.end();
@@ -27,15 +27,15 @@ module.exports = function routeNote(router) {
     return undefined;
   });
 
-  router.get('/api/v1/note', (req, res) => {
+  router.get('/api/v1/doge', (req, res) => {
     if (!req.url.query.id) {
-      res.writeHead(400, { 'Content-Type': 'text/plain' });
+      res.writeHead(404, { 'Content-Type': 'text/plain' });
       res.write('Your request requires an id');
       res.end();
       return undefined;
     }
 
-    storage.fetchOne('Note', req.url.query.id)
+    storage.fetchOne('Doge', req.url.query.id)
       .then((item) => {
         res.writeHead(200, { 'Content-Type': 'application/json' });
         res.write(JSON.stringify(item));
@@ -45,7 +45,7 @@ module.exports = function routeNote(router) {
       .catch((err) => {
         logger.log(logger.ERROR, err, JSON.stringify(err));
         res.writeHead(404, { 'Content-Type': 'text/plain' });
-        res.write('Resource not found');
+        res.write('Not found');
         res.end();
         return undefined;
       });
