@@ -1,6 +1,7 @@
 'use strict';
 
 const logger = require('./logger');
+
 const storage = module.exports = {};
 const memory = {};
 
@@ -15,13 +16,12 @@ const memory = {};
 //   }
 // }
 
-
-// schema is the type of resource, in this case DOGE, and it will just be a 'string' saying this is a note schema
 // item is an actual object we'll pass in to post a newly created note
+
 storage.create = function create(schema, item) {
   return new Promise((resolve, reject) => {
     if (!schema) return reject(new Error('Cannot create a new item, schema required'));
-    if (!item) return reject(new Error('Cannot createa a new item, item required'));
+    if (!item) return reject(new Error('Cannot create a new item, item required'));
 
     if (!memory[schema]) memory[schema] = {};
     memory[schema][item.id] = item;
@@ -44,14 +44,30 @@ storage.fetchOne = function fetchOne(schema, id) {
   });
 };
 
-storage.fetchAll = function fetchAll() {
-  
+storage.fetchAll = function fetchAll(schema, id) {
+  return new Promise((resolve, reject) => {
+    if (!schema) return reject(new Error('expected schema name'));
+    if (!id) return reject(new Error('expected id'));
+    if (!memory[schema]) return reject(new Error('schema not found'));
+
+    const allItems = Object.values(memory[schema]);
+    const doge = allItems.map(ids => memory[ids]);
+
+    if (doge) {
+      return reject(new Error('ojbect not found'));
+    }
+    return resolve(doge);
+  });
 };
 
-storage.update = function update() {
+storage.delete = function del(schema, id) {
+  return new Promise((resolve, reject) => {
+    if (!schema) return reject(new Error('expected schema name'));
+    if (!id) return reject(new Error('expected id'));
+    if (!memory[schema]) return reject(new Error('schema not found'));
 
-};
-
-storage.delete = function del() {
-
+    const item = memory[schema][id];
+    memory[schema][id] = null;
+    return resolve(item);
+  });
 };

@@ -28,12 +28,16 @@ describe('VALID request to the API', () => {
     describe('POST /api/v1/doge', () => {
       it('should respond with status 400 if no request body was provided or the body was invalid', () => {
         return superagent.post(`:${testPort}/api/v1/doge`)
-          .send(mockResource)
+          .send({})
           .then((response) => {
             mockId = response.body.id;
             expect(response.body.name).toEqual(mockResource.name);
             expect(response.body.breed).toEqual(mockResource.breed);
             expect(response.status).toEqual(400);
+          })
+          .catch((err) => {
+            expect(err).toBeTruthy();
+            expect(err.status).toEqual(400);
           });
       });
     });
@@ -42,11 +46,11 @@ describe('VALID request to the API', () => {
   describe('NOT FOUND', () => {
     describe('GET /api/v1/doge', () => {
       it('it should respond with NOT FOUND for valid requests made with an id that was not found', () => {
-        return superagent.get(':5000/api/v1/doge1')
+        return superagent.get(':5000/api/v1/doge')
           .then(() => {})
           .catch((err) => {
-            expect(err.status).toEqual(404);
             expect(err).toBeTruthy();
+            expect(err.status).toEqual(404);
           });
       });
     });
@@ -67,8 +71,7 @@ describe('VALID request to the API', () => {
     describe('VALID request to the API', () => {
       describe('GET /api/v1/doge', () => {
         it('it should contain a response body for a request made with a valid id', () => {
-          return superagent.post(`:${testPort}/api/v1/doge${mockId}`)
-            .send(mockResource)
+          return superagent.get(`:${testPort}/api/v1/doge?id=${mockId}`)
             .then((response) => {
               mockId = response.body.id;
               expect(response.body.name).toEqual(mockResource.name);
